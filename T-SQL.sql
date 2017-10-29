@@ -1,0 +1,80 @@
+USE xk
+
+GO
+--计算平均分
+SELECT AVG(成绩) AS'200502号学生平均分'
+FROM XSCJ
+WHERE 学号='200502'
+--求最大值与最小值
+SELECT MAX(成绩) AS'200502学生的最高分', MIN(成绩) AS'200502学生的最低分'
+FROM XSCJ
+WHERE 学号='200502'
+--统计满足条件的行数或总行数
+SELECT COUNT(*) AS'汉族总人数'
+FROM XSDA
+WHERE 名族='汉'
+--清除相同数据的统计
+SELECT COUNT(DISTINCT 学号) AS'学生人数'
+FROM XSDA
+--分组筛选数据
+SELECT 性别,COUNT(*) AS'人数'
+FROM XSDA
+GROUP BY 性别
+
+SELECT 系名,性别, AVG(总学分) AS'总学分的平均值'
+FROM XSDA
+GROUP BY 系名,性别
+--进一步筛选HAVING必须与group by一起使用
+SELECT 学号,AVG(成绩) AS'平均分'
+FROM XSCJ
+GROUP BY 学号
+HAVING AVG(成绩)>50
+--课程超过3门，成绩超过90
+SELECT 学号
+FROM XSCJ
+WHERE 成绩>60
+GROUP BY 学号
+HAVING COUNT(*)>3
+--计算与汇总
+SELECT 学号,姓名,性别,系名
+FROM XSDA
+WHERE 系名='信息' AND 性别='男'
+COMPUTE COUNT(学号)
+GO
+--分类汇总
+SELECT 学号,姓名,系名,总学分
+FROM XSDA
+ORDER BY 系名
+COMPUTE COUNT(学号) BY 系名
+--连接查询
+SELECT *
+FROM XSDA INNER JOIN XSCJ ON XSDA.学号=XSCJ.学号
+--左连接
+SELECT XSDA.*,XSCJ.*
+FROM XSDA LEFT JOIN XSCJ ON XSDA.学号=XSCJ.学号
+--右连接
+SELECT XSDA.*,XSCJ.*
+FROM XSDA RIGHT JOIN XSCJ ON XSDA.学号=XSCJ.学号
+--FULL JION
+--CROSS JOIN 交叉连接 不需要条件
+--自连接 
+SELECT XSDA1.姓名,XSDA1.学号,XSDA2.姓名
+FROM XSDA AS XSDA1 JOIN XSDA AS XSDA2 ON XSDA1.姓名=XSDA2.姓名
+--子查询 
+SELECT *
+FROM XSDA
+WHERE 学号 IN
+(SELECT 学号 
+FROM XSDA
+WHERE 性别='男'
+)
+--ANY比较子查询
+SELECT 学号,课程编号
+FROM XSCJ
+WHERE 课程编号='202' AND 成绩!<ANY
+( SELECT 成绩
+FROM XSCJ
+WHERE 课程编号='104'
+)
+--INTO 将查询结果保存到新表
+--UNION 将多个查询结果合并 使用ALL 不去除重复行，结果默认放在第一个表中 
